@@ -3,10 +3,7 @@ import sys
 
 main = Path(__file__).parent.parent / "ROM" / "ibm.ch8"
 
-
-
 mem=[0] * 4096 # total memory bytes
-
 
 display_x=64 #display width
 display_y=32 #display height
@@ -61,12 +58,40 @@ def read():
             mem[idx] = val
         print("reading done")
     
-
 def fetch(n):
     cnt = mem[n]
     cnt = cnt << 8
     cnt = cnt | mem[n+1]
     return cnt
+
+def frstn(instr):  # first nibble instruction
+    instr >>= 12
+    instr &= 0xF
+    return instr
+
+def scndn(rgs): # second nibble register
+    rgs >>= 8
+    rgs &= 0xF
+    return rgs
+
+def thrdn(rgs): # third nibble register
+    rgs >>= 4
+    rgs &= 0xF    
+    return rgs
+
+def N(data): # mask last nibble
+    data &= 0xF
+    return data
+
+def NN(data): # mask last 2 nibbles
+    data &= 0xFF
+    return data
+
+def NNN(data): # mask last 3 nibbles
+    data &= 0xFFF
+    return data
+
+
 
 #def fstN(n):
 #    cnt = fetch(n)
@@ -77,9 +102,29 @@ def fetch(n):
 apply_fonts()
 read()
 
-
 counter = 0x200
 print(hex(fetch(counter)))
+
+def six_eyes(value_in_hex):
+    r1 = frstn(value_in_hex)
+    r2 = scndn(value_in_hex)
+    r3 = thrdn(value_in_hex)
+    r4 = N(value_in_hex)
+    r5 = NN(value_in_hex)
+    r6 = NNN(value_in_hex)
+
+    print(hex(value_in_hex) + " so it's :" ,end=" ")
+    print(hex(r1),end=" ")
+    print(hex(r2),end=" ")
+    print(hex(r3),end=" ")
+    print(hex(r4),end=" ")
+    print(hex(r5),end=" ")
+    print(hex(r6),end="\n")
+
+six_eyes(0x6A2F)
+six_eyes(0xD123)
+six_eyes(0x00E0)
+
 
 #while True :
 
